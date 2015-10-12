@@ -12,7 +12,6 @@ RUN sed -i 's|://.*\..*\.com|://ru.archive.ubuntu.com|' /etc/apt/sources.list &&
 
 RUN apt-get update -y && DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y && apt-get clean && \
 	apt-get -y install \
-	python-setuptools \
 	ca-certificates curl  \
 	wget pkg-config &&\
         apt-get clean && \
@@ -48,16 +47,19 @@ RUN 	cd /usr/src &&\
         mkdir -p /var/nginx/pagespeed_cache
 
 # Magento Initialization and Startup Script
-ADD /scripts /scripts
-ADD /config /config
 RUN chmod 755 /scripts/*.sh
 
-# Supervisor Config
-RUN /usr/bin/easy_install supervisor &&\
-    /usr/bin/easy_install supervisor-stdout
-ADD /config/supervisor/supervisord.conf /etc/supervisord.conf
+# forward request and error logs to docker log collector
+RUN ln -sf /dev/stdout /var/log/nginx/access.log
+RUN ln -sf /dev/stderr /var/log/nginx/error.log
 
-VOLUME /var/www
+# Define mountable directories.
+VOLUME ["/etc/nginx/sites-enabled", "/etc/nginx/certs", "/etc/nginx/conf.d", "/var/log/nginx", "/var/www/html", "/var/cache/nginx"]
+
+# Define working directory.
+WORKDIR /var/www/html
+
 EXPOSE 80
+EXPOSE 443
 
-CMD ["/bin/bash", "/scripts/start.sh"]
+CMD ["nginx", "-g", "daemon off;"]
