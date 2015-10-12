@@ -46,8 +46,6 @@ RUN 	cd /usr/src &&\
         rm /usr/sbin/nginx &&\
         mkdir -p /var/nginx/pagespeed_cache
 
-# Magento Initialization and Startup Script
-RUN chmod 755 /scripts/*.sh
 
 # forward request and error logs to docker log collector
 RUN ln -sf /dev/stdout /var/log/nginx/access.log
