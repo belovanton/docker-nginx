@@ -19,7 +19,7 @@ RUN apt-get update -y && DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y 
 
 RUN apt-get update -y && DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y && apt-get clean && \
 	apt-get -y install \	
-	python python-pip python-dev nginx-extras libfreetype6 libfontconfig1 \
+	python python-pip libgeoip-dev python-dev nginx-extras libfreetype6 libfontconfig1 \
 	build-essential zlib1g-dev libpcre3 libpcre3-dev unzip libssl-dev &&\
 	apt-get clean && \
 	rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/* /download/directory
