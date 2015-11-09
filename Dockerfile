@@ -39,7 +39,7 @@ RUN 	cd /usr/src &&\
 	cd /usr/src/nginx-${NGINX_VERSION}/ && ./configure --add-module=/usr/src/ngx_pagespeed-release-${NPS_VERSION}-beta \ 
          --prefix=/usr/local/share/nginx --conf-path=/etc/nginx/nginx.conf \
          --sbin-path=/usr/local/sbin --error-log-path=/var/log/nginx/error.log \
-	 --with-http_ssl_module --with-ipv6 --with-http_geoip_module && \
+	 --with-http_ssl_module --with-ipv6 --with-http_geoip_module --with-http_v2_module && \
 	cd /usr/src/nginx-${NGINX_VERSION}/ && make &&\
 	cd /usr/src/nginx-${NGINX_VERSION}/ && sudo make install &&\
         sed -i 's|/usr/sbin/nginx|/home/nginx|g' /etc/init.d/nginx && \
