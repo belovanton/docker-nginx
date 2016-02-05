@@ -25,8 +25,8 @@ RUN apt-get update -y && DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y 
 	rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/* /download/directory
 
 #Install pagecahe module
-ENV NGINX_VERSION 1.9.5
-ENV NPS_VERSION 1.9.32.10
+ENV NGINX_VERSION 1.9.10
+ENV NPS_VERSION 1.10.33.4
 RUN 	cd /usr/src &&\
 	cd /usr/src &&\
 	cd /usr/src && wget https://github.com/pagespeed/ngx_pagespeed/archive/release-${NPS_VERSION}-beta.zip &&\
