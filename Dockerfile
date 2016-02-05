@@ -41,8 +41,8 @@ RUN 	cd /usr/src &&\
          --sbin-path=/usr/local/sbin --error-log-path=/var/log/nginx/error.log \
 	 --with-pcre-jit --with-http_stub_status_module --with-http_realip_module \
 	 --with-http_auth_request_module --with-http_addition_module --with-http_ssl_module \
-	 --with-ipv6 --with-http_geoip_module --with-http_v2_module --with-http_spdy_module  \
-	 --with-http_gzip_static_module --with-http_image_filter_module --with-http_sub_module --with-http_xslt_module && \
+	 --with-ipv6 --with-http_geoip_module --with-http_v2_module --with-http_gzip_static_module \
+	 --with-http_image_filter_module --with-http_sub_module --with-http_xslt_module && \
 	cd /usr/src/nginx-${NGINX_VERSION}/ && make &&\
 	cd /usr/src/nginx-${NGINX_VERSION}/ && sudo make install &&\
         sed -i 's|/usr/sbin/nginx|/home/nginx|g' /etc/init.d/nginx && \
