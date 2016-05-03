@@ -4,11 +4,6 @@ MAINTAINER Anton Belov anton4@bk.ru
 # Let the conatiner know that there is no tty
 ENV DEBIAN_FRONTEND noninteractive
 # Use source.list with all repositories and Yandex mirrors.
-ADD sources.list /etc/apt/sources.list
-RUN sed -i 's|://.*\..*\.com|://ru.archive.ubuntu.com|' /etc/apt/sources.list &&\
-    echo 'force-unsafe-io' | tee /etc/dpkg/dpkg.cfg.d/02apt-speedup &&\
-    echo 'DPkg::Post-Invoke {"/bin/rm -f /var/cache/apt/archives/*.deb || true";};' | tee /etc/apt/apt.conf.d/no-cache &&\
-    echo 'Acquire::http {No-Cache=True;};' | tee /etc/apt/apt.conf.d/no-http-cache
 
 RUN apt-get update -y && DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y && apt-get clean && \
 	apt-get -y install \
