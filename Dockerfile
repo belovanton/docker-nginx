@@ -1,28 +1,20 @@
-FROM ubuntu:latest 
+FROM centos:7
 MAINTAINER Anton Belov anton4@bk.ru
 
-# Let the conatiner know that there is no tty
-ENV DEBIAN_FRONTEND noninteractive
-# Use source.list with all repositories and Yandex mirrors.
+# Perform updates
+RUN yum -y update; yum clean all
 
-RUN apt-get update -y && DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y && apt-get clean && \
-	apt-get -y install \
-	ca-certificates curl  \
-	wget pkg-config &&\
-        apt-get clean && \
-        rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/* /download/directory
+# Install EPEL for owncloud packages
+RUN yum -y install epel-release; yum clean all
 
-RUN apt-get update -y && DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y && apt-get clean && \
-	apt-get -y install \	
-	python python-pip libgeoip-dev python-dev nginx-extras libfreetype6 libfontconfig1 \
-	build-essential zlib1g-dev libpcre3 libpcre3-dev unzip libssl-dev &&\
-	apt-get clean && \
-	rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/* /download/directory
+RUN useradd nginx
+RUN usermod -s /sbin/nologin nginx
 
 #Install pagecahe module
-ENV NGINX_VERSION 1.9.15
-ENV NPS_VERSION 1.11.33.0
-RUN 	cd /usr/src &&\
+ENV NGINX_VERSION 1.10.1
+ENV NPS_VERSION 1.11.33.2
+RUN 	yum -y install gcc-c++ wget GeoIP-devel GeoIP GeoIP-data unzip make python python-pip curl freetype openssl-devel pcre-devel zlib-devel ca-certificates python-devel &&\
+	cd /usr/src &&\
 	cd /usr/src &&\
 	cd /usr/src && wget https://github.com/pagespeed/ngx_pagespeed/archive/release-${NPS_VERSION}-beta.zip &&\
 	cd /usr/src && unzip release-${NPS_VERSION}-beta.zip &&\
@@ -33,21 +25,23 @@ RUN 	cd /usr/src &&\
 	cd /usr/src && tar -xvzf nginx-${NGINX_VERSION}.tar.gz &&\
 	cd /usr/src/nginx-${NGINX_VERSION}/ && ./configure --add-module=/usr/src/ngx_pagespeed-release-${NPS_VERSION}-beta \ 
          --prefix=/usr/local/share/nginx --conf-path=/etc/nginx/nginx.conf \
-         --sbin-path=/usr/local/sbin --error-log-path=/var/log/nginx/error.log \
+         --sbin-path=/usr/sbin --error-log-path=/var/log/nginx/error.log \
 	 --with-pcre-jit --with-http_stub_status_module --with-http_realip_module \
 	 --with-http_auth_request_module --with-http_addition_module --with-http_ssl_module \
 	 --with-ipv6 --with-http_geoip_module --with-http_v2_module --with-http_gzip_static_module \
 	 --with-http_sub_module && \
 	cd /usr/src/nginx-${NGINX_VERSION}/ && make &&\
-	cd /usr/src/nginx-${NGINX_VERSION}/ && sudo make install &&\
-        sed -i 's|/usr/sbin/nginx|/home/nginx|g' /etc/init.d/nginx && \
-        rm /usr/sbin/nginx &&\
+	cd /usr/src/nginx-${NGINX_VERSION}/ && make install &&\
+	rm -rf /usr/src/ngx_pagespeed-* && rm -rf /usr/src/nginx-* && rm -rf /usr/src/*.tar.gz && rm -rf /usr/src/*.zip &&\
+	yum -y remove  gcc-c++  wget unzip  && yum clean all &&\
         mkdir -p /var/nginx/pagespeed_cache
 
-
 # forward request and error logs to docker log collector
-RUN ln -sf /dev/stdout /var/log/nginx/access.log
-RUN ln -sf /dev/stderr /var/log/nginx/error.log
+RUN mkdir -p /var/log/nginx/ && chown nginx /var/log/nginx
+RUN touch /var/log/nginx/access.log 
+RUN touch /var/log/nginx/access.log
+RUN ln -sf /dev/stdout /var/log/nginx/access.log && chown nginx /var/log/nginx/access.log
+RUN ln -sf /dev/stderr /var/log/nginx/error.log  && chown nginx /var/log/nginx/error.log
 
 # Define mountable directories.
 VOLUME ["/etc/nginx", "/var/log/nginx", "/var/www/html", "/var/cache/nginx"]
@@ -58,4 +52,4 @@ WORKDIR /var/www/html
 EXPOSE 80
 EXPOSE 443
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
