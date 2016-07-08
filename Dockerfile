@@ -51,5 +51,5 @@ WORKDIR /var/www/html
 
 EXPOSE 80
 EXPOSE 443
-
+RUN groupadd --gid 33 www-data && useradd --uid 33 --gid 33 www-data
 CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
