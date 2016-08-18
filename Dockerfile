@@ -42,13 +42,11 @@ RUN 	yum -y install gcc-c++ wget GeoIP-devel GeoIP GeoIP-data unzip make python 
 	yum -y remove  gcc-c++  wget unzip  && yum clean all &&\
         mkdir -p /var/nginx/pagespeed_cache && chown -R nginx /var/nginx
 
-
+RUN groupadd --gid 33 www-data && useradd --uid 33 --gid 33 www-data
 # forward request and error logs to docker log collector
-RUN mkdir -p /var/log/nginx/ && chown nginx /var/log/nginx
-RUN touch /var/log/nginx/access.log 
-RUN touch /var/log/nginx/access.log
-RUN ln -sf /dev/stdout /var/log/nginx/access.log && chown nginx /var/log/nginx/access.log
-RUN ln -sf /dev/stderr /var/log/nginx/error.log  && chown nginx /var/log/nginx/error.log
+RUN mkdir -p /var/log/nginx/ && chown www-data /var/log/nginx
+RUN ln -sf /dev/stdout /var/log/nginx/access.log
+RUN ln -sf /dev/stderr /var/log/nginx/error.log
 
 # Define mountable directories.
 VOLUME ["/etc/nginx", "/var/log/nginx", "/var/www/html", "/var/cache/nginx"]
@@ -58,5 +56,5 @@ WORKDIR /var/www/html
 
 EXPOSE 80
 EXPOSE 443
-RUN groupadd --gid 33 www-data && useradd --uid 33 --gid 33 www-data
+
 CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
